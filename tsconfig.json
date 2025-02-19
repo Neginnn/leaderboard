@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    "target": "ES2015",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "types": ["@emotion/react/types/css-prop", "jest"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "checkJs": true,
+    "removeComments": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/images/*": ["public/web-assets/images/*"],
+      "@/components/*": ["src/components/*"],
+      "@/helpers/*": ["src/utils/helpers/*"],
+      "@/hooks/*": ["src/utils/hooks/*"],
+      "@/queries/*": ["src/utils/queries/*"],
+      "@/services/*": ["src/utils/services/*"],
+      "@/configs/*": ["src/utils/configs/*"],
+      "@/context/*": ["src/utils/context/*"],
+      "@/utils/*": ["src/utils/*"],
+      "@/styles/*": ["src/styles/*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
+}

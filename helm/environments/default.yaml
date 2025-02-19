@@ -1,0 +1,77 @@
+# Everything that's static through environments should be in here
+# This is the default yaml file for the helm chart. or in the chart
+# values.yaml are used, but variables are superceded by anything
+# in helm/environments/ENVIRONMENT.yaml.
+
+image:
+  pullPolicy: IfNotPresent
+
+replicaCount: 2
+
+image:
+  repository: negin/negin_test
+
+# this should pretty much always be in here
+ingress:
+  enabled: true
+  annotations:
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.org/mergeable-ingress-type: minion
+  paths:
+    - "/_next/"
+    - "/web-assets/"
+    - "/test/environment"
+
+  exactpaths:
+    - "/"
+
+readiness:
+  enabled: true
+  probe:
+    httpGet:
+      path: /
+      port: 3000
+    initialDelaySeconds: 30
+    periodSeconds: 11
+    timeoutSeconds: 1
+
+liveness:
+  enabled: true
+  probe:
+    httpGet:
+      path: /
+      port: 3000
+    initialDelaySeconds: 60
+    periodSeconds: 31
+    timeoutSeconds: 5
+
+initBuild:
+  enabled: true
+  buildPath: "/app/.next"
+
+service:
+  port: 3000
+
+# This probably doesn't change much between environments
+resources:
+  limits:
+    cpu: 400m
+    memory: 512Mi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+nodeSelector:
+  type: private
+
+tolerations: []
+
+affinity: {}
+
+# Expose the secrets.json file for the environment as variables. A little experimental.
+
+SecretsAsVariables: false
+
+secrets:
+  enabled: true

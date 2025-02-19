@@ -1,0 +1,14 @@
+{
+  "email_address": "ronjon32@gmail.com",
+  "first_name": "John",
+  "last_name": "Doe",
+  "offer": {
+    "amount": 1000,
+    "apr": 1,
+    "terms": 1,
+    "estimated_payments": 18.19,
+    "payment_frequency": "weekly",
+    "expires_at": "2022-07-13T07:21:39.000Z",
+    "is_expired": false
+  }
+}
