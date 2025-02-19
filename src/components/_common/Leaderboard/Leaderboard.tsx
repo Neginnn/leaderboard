@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { LeaderboardStyles } from './styles';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { LeaderboardStyles } from "./styles";
 
 interface User {
   id?: number;
@@ -12,42 +12,49 @@ interface User {
 
 export const Leaderboard: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
-  const [search, setSearch] = useState<string>('');
+  const [search, setSearch] = useState<string>("");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [sortConfig, setSortConfig] = useState<{
     key: keyof User;
-    direction: 'asc' | 'desc';
+    direction: "asc" | "desc";
   } | null>(null);
 
   useEffect(() => {
-    axios.get('http://localhost:5050/users').then((res) => {
-      setUsers(res.data);
-    });
+    const controller = new AbortController();
+    axios
+      .get("http://localhost:5050/users", { signal: controller.signal })
+      .then((res) => {
+        setUsers(res.data);
+      })
+      .catch((error) => {
+        if (error.name !== "CanceledError") {
+          console.error("Error fetching users:", error);
+        }
+      });
+
+    return () => controller.abort(); // Cleanup function
   }, []);
 
   const updatePoints = (id: number, change: number) => {
     setUsers((prev) => {
-      // Update the points of the selected user
       const updatedUsers = prev.map((user) =>
         user.id === id ? { ...user, points: user.points + change } : user
       );
-
-      // Sort users by points after updating
-      const sortedUsers = updatedUsers.sort((a, b) => b.points - a.points);
-
-      return sortedUsers;
+      return [...updatedUsers].sort((a, b) => b.points - a.points); // Sort properly
     });
   };
 
   const sortUsers = (users: User[]) => {
     if (sortConfig) {
       return [...users].sort((a, b) => {
-        if (sortConfig.key === 'name') {
-          return sortConfig.direction === 'asc'
+        if (sortConfig.key === "name") {
+          return sortConfig.direction === "asc"
             ? a.name.localeCompare(b.name)
             : b.name.localeCompare(a.name);
-        } else if (sortConfig.key === 'points') {
-          return sortConfig.direction === 'asc' ? a.points - b.points : b.points - a.points;
+        } else if (sortConfig.key === "points") {
+          return sortConfig.direction === "asc"
+            ? a.points - b.points
+            : b.points - a.points;
         }
         return 0;
       });
@@ -62,16 +69,18 @@ export const Leaderboard: React.FC = () => {
 
     if (!userInput) return;
 
-    const [newName, newAge, newAddress] = userInput.split(',').map((item) => item.trim());
+    const [newName, newAge, newAddress] = userInput
+      .split(",")
+      .map((item) => item.trim());
 
     if (!newName) {
-      alert('Name is required.');
+      alert("Name is required.");
       return;
     }
 
     const ageNumber = parseInt(newAge);
     if (isNaN(ageNumber)) {
-      alert('Age must be a valid number.');
+      alert("Age must be a valid number.");
       return;
     }
 
@@ -79,20 +88,19 @@ export const Leaderboard: React.FC = () => {
       name: newName,
       age: ageNumber,
       points: 0,
-      address: newAddress || 'Unknown'
+      address: newAddress || "Unknown",
     };
 
     axios
-      .post('http://localhost:5050/users', newUser)
+      .post("http://localhost:5050/users", newUser)
       .then((res) => {
         setUsers((prevUsers) => sortUsers([...prevUsers, res.data])); // Sort after adding the new user
       })
       .catch((error) => {
-        console.error('Error:', error);
-        alert('An error occurred while adding the user.');
+        console.error("Error:", error);
+        alert("An error occurred while adding the user.");
       });
   };
-
 
   const deleteUser = (id: number) => {
     axios
@@ -102,8 +110,8 @@ export const Leaderboard: React.FC = () => {
         setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
       })
       .catch((error) => {
-        console.error('There was an error deleting the user:', error);
-        alert('An error occurred while deleting the user.');
+        console.error("There was an error deleting the user:", error);
+        alert("An error occurred while deleting the user.");
       });
   };
 
@@ -112,14 +120,26 @@ export const Leaderboard: React.FC = () => {
   );
 
   const sortUsersByColumn = (key: keyof User) => {
-    let direction: 'asc' | 'desc' = 'asc';
-
-    if (sortConfig?.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
+    let direction: "asc" | "desc" = "asc";
+    if (sortConfig?.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
     }
-
     setSortConfig({ key, direction });
-    setUsers(sortUsers(filteredUsers)); // Sort filtered users after sorting column
+
+    setUsers((prevUsers) =>
+      [...prevUsers].sort((a, b) => {
+        if (key === "name") {
+          return direction === "asc"
+            ? a.name.localeCompare(b.name)
+            : b.name.localeCompare(a.name);
+        } else if (key === "points") {
+          return direction === "asc"
+            ? a.points - b.points
+            : b.points - a.points;
+        }
+        return 0;
+      })
+    );
   };
 
   return (
@@ -135,17 +155,21 @@ export const Leaderboard: React.FC = () => {
         <div className="leaderboard-header">
           <div
             className={`leaderboard-header-item ${
-              sortConfig?.key === 'name' ? `sorting ${sortConfig.direction}` : ''
+              sortConfig?.key === "name"
+                ? `sorting ${sortConfig.direction}`
+                : ""
             }`}
-            onClick={() => sortUsersByColumn('name')}
+            onClick={() => sortUsersByColumn("name")}
           >
             Name
           </div>
           <div
             className={`leaderboard-header-item ${
-              sortConfig?.key === 'points' ? `sorting ${sortConfig.direction}` : ''
+              sortConfig?.key === "points"
+                ? `sorting ${sortConfig.direction}`
+                : ""
             }`}
-            onClick={() => sortUsersByColumn('points')}
+            onClick={() => sortUsersByColumn("points")}
           >
             Points
           </div>
@@ -156,7 +180,9 @@ export const Leaderboard: React.FC = () => {
           {filteredUsers.map((user) => (
             <div
               key={user.id}
-              className={`leaderboard-row ${selectedUser?.id === user.id ? 'selected' : ''}`}
+              className={`leaderboard-row ${
+                selectedUser?.id === user.id ? "selected" : ""
+              }`}
               onClick={() => setSelectedUser(user)}
             >
               <div className="leaderboard-item">{user.name}</div>
