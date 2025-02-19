@@ -1,0 +1,39 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "name": "Jack",
+      "age": 25,
+      "points": 0,
+      "address": "Toronto, CA"
+    },
+    {
+      "id": "2",
+      "name": "Noah",
+      "age": 30,
+      "points": 0,
+      "address": "Vancouver, CA"
+    },
+    {
+      "id": "3",
+      "name": "James",
+      "age": 28,
+      "points": 0,
+      "address": "Montreal, CA"
+    },
+    {
+      "id": "4",
+      "name": "Will",
+      "age": 22,
+      "points": 0,
+      "address": "Ottawa, CA"
+    },
+    {
+      "id": "5",
+      "name": "Oscar",
+      "age": 26,
+      "points": 0,
+      "address": "Calgary, CA"
+    }
+  ]
+}
